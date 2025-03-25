@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Services\PhpService;
+use App\Services\NpmService;
 use function Laravel\Prompts\text;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\note;
@@ -42,17 +43,11 @@ class GetLibraries extends Command
         note("Found the following required dev PHP libraries:");
         info($phpService->getDevLibraries());
 
-        // NPM dependencies
-        $packageJson = json_decode(file_get_contents($projectPath . '/package.json'));
-        $requiredNpmLibraries = collect($packageJson->dependencies)->keys()->all();
-        // TODO add validation to ensure devDependencies key exists
-        // $requiredDevNpmLibraries = collect($packageJson->devDependencies)->keys()->all();
-
-        $requiredNpmLibrariesString = implode(', ', $requiredNpmLibraries);
-        // $requiredDevNpmLibrariesString = implode(', ', $requiredDevPhpLibraries);
+        $npmService = new NpmService($projectPath);
         note("Found the following required NPM libraries:");
-        info($requiredNpmLibrariesString);
+        info($npmService->getLibraries());
+        // TODO add validation to ensure devDependencies key exists
         // note("Found the following required dev NPM libraries:");
-        // info($requiredDevNpmLibrariesString);
+        // info($npmService->getDevLibraries());
     }
 }
