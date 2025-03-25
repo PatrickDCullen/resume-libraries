@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use function Laravel\Prompts\text;
 use function Laravel\Prompts\info;
+use function Laravel\Prompts\note;
 
 class GetLibraries extends Command
 {
@@ -39,12 +40,16 @@ class GetLibraries extends Command
         // json encoded string (serialized)
         $jsonEncodedString = file_get_contents($path);
         // PHP value object containing composer.json
-        $composerDotJson = json_decode($jsonEncodedString);
+        $composerJson = json_decode($jsonEncodedString);
         // PHP array of REQUIRED libraries (doesn't include dev)
-        $libraries = collect($composerDotJson->require)->keys()->all();
+        $requiredPhpLibraries = collect($composerJson->require)->keys()->all();
+        $requiredDevPhpLibraries = collect($composerJson->{'require-dev'})->keys()->all();
 
-        $librariesString = implode(', ', $libraries);
-        info("Found the following libraries:");
-        info($librariesString);
+        $requiredPhpLibrariesString = implode(', ', $requiredPhpLibraries);
+        $requiredDevPhpLibrariesString = implode(', ', $requiredDevPhpLibraries);
+        note("Found the following required PHP libraries:");
+        info($requiredPhpLibrariesString);
+        note("Found the following required dev PHP libraries:");
+        info($requiredDevPhpLibrariesString);
     }
 }
