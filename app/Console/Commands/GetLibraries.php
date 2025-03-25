@@ -35,6 +35,7 @@ class GetLibraries extends Command
             hint: 'Not sure? Navigate to the project in your terminal and use the pwd command.'
         );
 
+        // PHP dependencies
         $composerJson = json_decode(file_get_contents($path . '/composer.json'));
         $requiredPhpLibraries = collect($composerJson->require)->keys()->all();
         $requiredDevPhpLibraries = collect($composerJson->{'require-dev'})->keys()->all();
@@ -45,5 +46,18 @@ class GetLibraries extends Command
         info($requiredPhpLibrariesString);
         note("Found the following required dev PHP libraries:");
         info($requiredDevPhpLibrariesString);
+
+        // NPM dependencies
+        $packageJson = json_decode(file_get_contents($path . '/package.json'));
+        $requiredNpmLibraries = collect($packageJson->dependencies)->keys()->all();
+        // TODO add validation to ensure devDependencies key exists
+        // $requiredDevNpmLibraries = collect($packageJson->devDependencies)->keys()->all();
+
+        $requiredNpmLibrariesString = implode(', ', $requiredNpmLibraries);
+        // $requiredDevNpmLibrariesString = implode(', ', $requiredDevPhpLibraries);
+        note("Found the following required NPM libraries:");
+        info($requiredNpmLibrariesString);
+        // note("Found the following required dev NPM libraries:");
+        // info($requiredDevNpmLibrariesString);
     }
 }
