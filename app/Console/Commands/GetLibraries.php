@@ -28,20 +28,14 @@ class GetLibraries extends Command
      */
     public function handle()
     {
-        $absolutePath = base_path('composer.json');
-
         $path = text(
-            label: 'Enter the absolute path of the composer.json file you would like to parse.',
-            placeholder: $absolutePath,
-            default: $absolutePath,
-            hint: 'Not sure? Navigate to the file in your terminal and use the pwd command.'
+            label: 'Enter the absolute path of the project containing the composer.json file you would like to parse.',
+            placeholder: base_path(),
+            default: base_path(),
+            hint: 'Not sure? Navigate to the project in your terminal and use the pwd command.'
         );
 
-        // json encoded string (serialized)
-        $jsonEncodedString = file_get_contents($path);
-        // PHP value object containing composer.json
-        $composerJson = json_decode($jsonEncodedString);
-        // PHP array of REQUIRED libraries (doesn't include dev)
+        $composerJson = json_decode(file_get_contents($path . '/composer.json'));
         $requiredPhpLibraries = collect($composerJson->require)->keys()->all();
         $requiredDevPhpLibraries = collect($composerJson->{'require-dev'})->keys()->all();
 
