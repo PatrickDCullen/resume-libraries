@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Services\PhpService;
 use function Laravel\Prompts\text;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\note;
@@ -21,34 +22,28 @@ class GetLibraries extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Get the PHP and NPM libraries used in a project.';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $path = text(
-            label: 'Enter the absolute path of the project containing the composer.json file you would like to parse.',
+        $projectPath = text(
+            label: 'Enter the absolute path of the project containing the composer.json and package.json files you would like to parse.',
             placeholder: base_path(),
             default: base_path(),
             hint: 'Not sure? Navigate to the project in your terminal and use the pwd command.'
         );
 
-        // PHP dependencies
-        $composerJson = json_decode(file_get_contents($path . '/composer.json'));
-        $requiredPhpLibraries = collect($composerJson->require)->keys()->all();
-        $requiredDevPhpLibraries = collect($composerJson->{'require-dev'})->keys()->all();
-
-        $requiredPhpLibrariesString = implode(', ', $requiredPhpLibraries);
-        $requiredDevPhpLibrariesString = implode(', ', $requiredDevPhpLibraries);
+        $phpService = new PhpService($projectPath);
         note("Found the following required PHP libraries:");
-        info($requiredPhpLibrariesString);
+        info($phpService->getLibraries());
         note("Found the following required dev PHP libraries:");
-        info($requiredDevPhpLibrariesString);
+        info($phpService->getDevLibraries());
 
         // NPM dependencies
-        $packageJson = json_decode(file_get_contents($path . '/package.json'));
+        $packageJson = json_decode(file_get_contents($projectPath . '/package.json'));
         $requiredNpmLibraries = collect($packageJson->dependencies)->keys()->all();
         // TODO add validation to ensure devDependencies key exists
         // $requiredDevNpmLibraries = collect($packageJson->devDependencies)->keys()->all();
