@@ -25,10 +25,8 @@ class NpmService
             return;
         }
 
-        $requiredNpmDevLibraries = $this->getDevLibraries($packageJson);
-
         note("Found the following required dev NPM libraries:");
-        info($requiredNpmDevLibraries);
+        info($this->getDevLibraries($packageJson));
         return;
     }
 
