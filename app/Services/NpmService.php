@@ -4,6 +4,7 @@ namespace App\Services;
 
 use function Laravel\Prompts\note;
 use function Laravel\Prompts\info;
+use function Laravel\Prompts\warning;
 
 class NpmService
 {
@@ -22,7 +23,7 @@ class NpmService
         $packageJson = json_decode(file_get_contents($this->path . '/package.json'));
 
         if (! property_exists($packageJson, 'devDependencies')) {
-            note("No required dev NPM libraries found.");
+            warning("No required dev NPM libraries found.");
             return;
         }
 
