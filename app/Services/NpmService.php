@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use function Laravel\Prompts\note;
+use function Laravel\Prompts\info;
 
 class NpmService
 {
