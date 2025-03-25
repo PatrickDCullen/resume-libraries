@@ -46,8 +46,6 @@ class GetLibraries extends Command
         $npmService = new NpmService($projectPath);
         note("Found the following required NPM libraries:");
         info($npmService->getLibraries());
-        // TODO add validation to ensure devDependencies key exists
-        // note("Found the following required dev NPM libraries:");
-        // info($npmService->getDevLibraries());
+        $npmService->printDevLibraries();
     }
 }
