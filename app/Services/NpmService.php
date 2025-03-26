@@ -55,7 +55,7 @@ class NpmService
     {
         $requiredNpmDevLibraries = collect($packageJson->devDependencies)->keys()->all();
 
-        // Sort them here
+        // TODO ensure this actually works, probably doesn't (reference get Libraries)
         $sortedPackages = collect();
 
         $requiredNpmDevLibraries->each(function ($package) use ($sortedPackages) {
