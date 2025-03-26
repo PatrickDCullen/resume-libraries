@@ -44,7 +44,7 @@ class GetLibraries extends Command
         info($phpService->getDevLibraries());
 
         $npmService = new NpmService($projectPath);
-        note("Found the following required NPM libraries:");
+        note("Found the following required NPM libraries, ordered by downloads over the last year:");
         info($npmService->getLibraries());
         $npmService->printDevLibraries();
     }

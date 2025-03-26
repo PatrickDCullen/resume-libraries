@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Http;
 use function Laravel\Prompts\note;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\warning;
@@ -14,8 +15,26 @@ class NpmService
     public function getLibraries() : string
     {
         $packageJson = json_decode(file_get_contents($this->path . '/package.json'));
-        $requiredNpmLibraries = collect($packageJson->dependencies)->keys()->all();
-        return implode(', ', $requiredNpmLibraries);
+
+        $requiredNpmLibraries = collect($packageJson->dependencies)->keys();
+
+        // Start of sorting by downloads logic
+        $sortedPackages = collect();
+        $requiredNpmLibraries->each(function ($package) use ($sortedPackages) {
+            $packageWithDownloads = Http::get(
+                "https://api.npmjs.org/downloads/point/last-year/" . $package
+            )->json();
+
+            $sortedPackages = $sortedPackages->prepend($packageWithDownloads);
+        });
+
+        $sortedPackages = $sortedPackages->sortBy(function (array $package) {
+            return $package["downloads"] * -1;
+        });
+
+        $packagesListByDownloads = $sortedPackages->pluck('package');
+
+        return implode(', ', $packagesListByDownloads->toArray());
     }
 
     public function printDevLibraries() : void
@@ -35,6 +54,24 @@ class NpmService
     public function getDevLibraries($packageJson) : string
     {
         $requiredNpmDevLibraries = collect($packageJson->devDependencies)->keys()->all();
-        return implode(', ', $requiredNpmDevLibraries);
+
+        // Sort them here
+        $sortedPackages = collect();
+
+        $requiredNpmDevLibraries->each(function ($package) use ($sortedPackages) {
+            $packageWithDownloads = Http::get(
+                "https://api.npmjs.org/downloads/point/last-year/" . $package
+            )->json();
+
+            $sortedPackages = $sortedPackages->prepend($packageWithDownloads);
+        });
+
+        $sortedPackages = $sortedPackages->sortBy(function (array $package) {
+            return $package["downloads"] * -1;
+        });
+
+        $packagesListByDownloads = $sortedPackages->pluck('name');
+
+        return implode(', ', $packagesListByDownloads);
     }
 }
