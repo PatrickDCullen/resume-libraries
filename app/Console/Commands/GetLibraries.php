@@ -35,7 +35,6 @@ class GetLibraries extends Command
     {
         $projectsPath = $this->getProjectsPath();
 
-        // Loop through each folder in the projects path
         $disk = Storage::build([
             "driver" => "local",
             "root" => $projectsPath
@@ -43,28 +42,21 @@ class GetLibraries extends Command
 
         $projects = collect($disk->directories("/"));
 
-        // dd($projects);
-
-        // Call the php service on each of them
-        $projects->each(function ($projectPath) {
-            $phpService = new PhpService($projectPath);
-            note("Found the following required PHP libraries:");
+        $projects->each(function ($projectDir) use ($projectsPath) {
+            $phpService = new PhpService($projectsPath . "/" . $projectDir);
+            // For now, don't worry about repetition - merging will come later
+            note("Found the following required PHP libraries for " . $projectDir . ":");
             info($phpService->getLibraries());
-            note("Found the following required dev PHP libraries:");
+            note("Found the following required dev PHP libraries for " . $projectDir . ":");
             info($phpService->getDevLibraries());
+
+            // TODO include which project the dependencies were found for
+            $npmService = new NpmService($projectsPath . "/" . $projectDir);
+            note("Found the following required NPM libraries, ordered by downloads over the last year:");
+            info($npmService->getLibraries());
+            $npmService->printDevLibraries();
         });
-        // For now, don't worry about repetition
 
-        // $phpService = new PhpService($projectPath);
-        // note("Found the following required PHP libraries:");
-        // info($phpService->getLibraries());
-        // note("Found the following required dev PHP libraries:");
-        // info($phpService->getDevLibraries());
-
-        $npmService = new NpmService($projectPath);
-        note("Found the following required NPM libraries, ordered by downloads over the last year:");
-        info($npmService->getLibraries());
-        $npmService->printDevLibraries();
     }
 
     private function getProjectsPath()

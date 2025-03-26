@@ -18,7 +18,7 @@ class NpmService
 
         $requiredNpmLibraries = collect($packageJson->dependencies)->keys();
 
-        // Start of sorting by downloads logic
+        // TODO refactor common code with getDevLibraries to dedicated method?
         $sortedPackages = collect();
         $requiredNpmLibraries->each(function ($package) use ($sortedPackages) {
             $packageWithDownloads = Http::get(
@@ -53,9 +53,8 @@ class NpmService
 
     public function getDevLibraries($packageJson) : string
     {
-        $requiredNpmDevLibraries = collect($packageJson->devDependencies)->keys()->all();
+        $requiredNpmDevLibraries = collect($packageJson->devDependencies)->keys();
 
-        // TODO ensure this actually works, probably doesn't (reference get Libraries)
         $sortedPackages = collect();
 
         $requiredNpmDevLibraries->each(function ($package) use ($sortedPackages) {
@@ -70,8 +69,8 @@ class NpmService
             return $package["downloads"] * -1;
         });
 
-        $packagesListByDownloads = $sortedPackages->pluck('name');
+        $packagesListByDownloads = $sortedPackages->pluck('package');
 
-        return implode(', ', $packagesListByDownloads);
+        return implode(', ', $packagesListByDownloads->toArray());
     }
 }

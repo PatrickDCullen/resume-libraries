@@ -4,6 +4,7 @@ namespace App\Services;
 
 class PhpService
 {
+    // Takes the absolute path to a given project
     public function __construct(protected string $path){
     }
 
