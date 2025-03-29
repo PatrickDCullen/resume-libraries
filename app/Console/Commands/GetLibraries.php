@@ -52,8 +52,7 @@ class GetLibraries extends Command
 
             // TODO include which project the dependencies were found for
             $npmService = new NpmService($projectsPath . "/" . $projectDir);
-            note("Found the following required NPM libraries, ordered by downloads over the last year:");
-            info($npmService->getLibraries());
+            $npmService->printLibraries();
             $npmService->printDevLibraries();
         });
 
@@ -66,7 +65,7 @@ class GetLibraries extends Command
             ->value();
 
         $confirmed = confirm(
-            label: 'Confirm whether this is the folder that contains your projects: ' . $inferredProjectsPath,
+            label: 'Is this the folder that contains your projects? ' . $inferredProjectsPath,
             default: true,
             yes: 'Yes',
             no: 'No, let me change it',

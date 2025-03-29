@@ -12,10 +12,36 @@ class NpmService
     public function __construct(protected string $path){
     }
 
-    public function getLibraries() : string
+    public function printLibraries() : void
     {
         $packageJson = json_decode(file_get_contents($this->path . '/package.json'));
 
+        if (! property_exists($packageJson, 'dependencies')) {
+            warning("No required NPM libraries found.");
+            return;
+        }
+
+        note("Found the following required NPM libraries, ordered by downloads over the last year:");
+        info($this->getLibraries($packageJson));
+        return;
+    }
+
+    public function printDevLibraries() : void
+    {
+        $packageJson = json_decode(file_get_contents($this->path . '/package.json'));
+
+        if (! property_exists($packageJson, 'devDependencies')) {
+            warning("No required dev NPM libraries found.");
+            return;
+        }
+
+        note("Found the following required dev NPM libraries, ordered by downloads over the last year:");
+        info($this->getDevLibraries($packageJson));
+        return;
+    }
+
+    private function getLibraries($packageJson) : string
+    {
         $requiredNpmLibraries = collect($packageJson->dependencies)->keys();
 
         // TODO refactor common code with getDevLibraries to dedicated method?
@@ -37,21 +63,8 @@ class NpmService
         return implode(', ', $packagesListByDownloads->toArray());
     }
 
-    public function printDevLibraries() : void
-    {
-        $packageJson = json_decode(file_get_contents($this->path . '/package.json'));
 
-        if (! property_exists($packageJson, 'devDependencies')) {
-            warning("No required dev NPM libraries found.");
-            return;
-        }
-
-        note("Found the following required dev NPM libraries:");
-        info($this->getDevLibraries($packageJson));
-        return;
-    }
-
-    public function getDevLibraries($packageJson) : string
+    private function getDevLibraries($packageJson) : string
     {
         $requiredNpmDevLibraries = collect($packageJson->devDependencies)->keys();
 
