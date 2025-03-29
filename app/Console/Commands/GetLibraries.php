@@ -41,7 +41,12 @@ class GetLibraries extends Command
             "root" => $projectsPath
         ]);
 
-        $projects = collect($disk->directories("/"));
+        $projects = collect($disk->directories("/"))->filter(function ($project) {
+            // Remove this project from the projects array
+            return $project !== Str::of(base_path())
+                ->remove(Str::beforeLast(base_path(), "/") . "/")
+                ->value();
+        });
 
         $projects->each(function ($projectDir) use ($projectsPath) {
             // For now, don't worry about repetition - merging will come later
