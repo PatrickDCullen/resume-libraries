@@ -27,7 +27,7 @@ class GetLibraries extends Command
      *
      * @var string
      */
-    protected $description = 'Get the PHP and NPM libraries used in a project.';
+    protected $description = 'Get the PHP and NPM libraries used in each project in a projects directory.';
 
     /**
      * Execute the console command.
@@ -44,9 +44,9 @@ class GetLibraries extends Command
         $projects = collect($disk->directories("/"));
 
         $projects->each(function ($projectDir) use ($projectsPath) {
+            // For now, don't worry about repetition - merging will come later
             note("Getting PHP and JavaScript dependencies for " . $projectDir);
             $phpService = new PhpService($projectsPath . "/" . $projectDir);
-            // For now, don't worry about repetition - merging will come later
             note("Found the following required PHP libraries for " . $projectDir . ":");
             info($phpService->getLibraries());
             note("Found the following required dev PHP libraries for " . $projectDir . ":");
