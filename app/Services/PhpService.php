@@ -8,6 +8,11 @@ class PhpService
     public function __construct(protected string $path){
     }
 
+    public function composerJsonExists() : bool
+    {
+        return file_exists($this->path . '/composer.json');
+    }
+
     public function getLibraries() : string
     {
         $composerJson = json_decode(file_get_contents($this->path . '/composer.json'));

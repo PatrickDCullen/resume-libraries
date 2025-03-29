@@ -47,10 +47,14 @@ class GetLibraries extends Command
             // For now, don't worry about repetition - merging will come later
             note("Getting PHP and JavaScript dependencies for " . $projectDir);
             $phpService = new PhpService($projectsPath . "/" . $projectDir);
-            note("Found the following required PHP libraries for " . $projectDir . ":");
-            info($phpService->getLibraries());
-            note("Found the following required dev PHP libraries for " . $projectDir . ":");
-            info($phpService->getDevLibraries());
+            if ($phpService->composerJsonExists()) {
+                note("Found the following required PHP libraries for " . $projectDir . ":");
+                info($phpService->getLibraries());
+                note("Found the following required dev PHP libraries for " . $projectDir . ":");
+                info($phpService->getDevLibraries());
+            } else {
+                warning("No composer.json found, skipping.");
+            }
 
             $npmService = new NpmService($projectsPath . "/" . $projectDir);
             $packageJson = $npmService->getPackageJson();
