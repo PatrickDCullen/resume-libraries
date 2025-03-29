@@ -44,8 +44,8 @@ class NpmService
     {
         $requiredNpmLibraries = collect($packageJson->dependencies)->keys();
 
-        // TODO refactor common code with getDevLibraries to dedicated method?
         $sortedPackages = collect();
+
         $requiredNpmLibraries->each(function ($package) use ($sortedPackages) {
             $packageWithDownloads = Http::get(
                 "https://api.npmjs.org/downloads/point/last-year/" . $package

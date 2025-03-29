@@ -43,6 +43,7 @@ class GetLibraries extends Command
         $projects = collect($disk->directories("/"));
 
         $projects->each(function ($projectDir) use ($projectsPath) {
+            note("Getting PHP and JavaScript dependencies for " . $projectDir);
             $phpService = new PhpService($projectsPath . "/" . $projectDir);
             // For now, don't worry about repetition - merging will come later
             note("Found the following required PHP libraries for " . $projectDir . ":");
@@ -50,10 +51,10 @@ class GetLibraries extends Command
             note("Found the following required dev PHP libraries for " . $projectDir . ":");
             info($phpService->getDevLibraries());
 
-            // TODO include which project the dependencies were found for
             $npmService = new NpmService($projectsPath . "/" . $projectDir);
             $npmService->printLibraries();
             $npmService->printDevLibraries();
+            note("Done getting PHP and JavaScript dependencies for " . $projectDir);
         });
 
     }
