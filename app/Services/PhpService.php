@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use function Laravel\Prompts\note;
+use function Laravel\Prompts\info;
 
 class PhpService
 {
@@ -15,7 +17,7 @@ class PhpService
         return file_exists($this->path . '/composer.json');
     }
 
-    public function getLibraries() : string
+    public function getLibraries($projectDir) : void
     {
         $composerJson = json_decode(file_get_contents($this->path . '/composer.json'));
         $requiredPhpLibraries = collect($composerJson->require)->keys();
@@ -38,7 +40,9 @@ class PhpService
 
         $librariesByDownloads = $sortedLibraries->pluck("library");
 
-        return implode(', ', $librariesByDownloads->toArray());
+        note("Found the following required PHP libraries for " . $projectDir . ":");
+        info(implode(', ', $librariesByDownloads->toArray()));
+        return;
     }
 
     public function getDevLibraries() : string

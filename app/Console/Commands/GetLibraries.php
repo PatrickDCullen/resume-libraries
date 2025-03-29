@@ -12,6 +12,7 @@ use function Laravel\Prompts\info;
 use function Laravel\Prompts\note;
 use function Laravel\Prompts\warning;
 use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\spin;
 
 class GetLibraries extends Command
 {
@@ -53,8 +54,13 @@ class GetLibraries extends Command
             note("Getting PHP and JavaScript dependencies for " . $projectDir);
             $phpService = new PhpService($projectsPath . "/" . $projectDir);
             if ($phpService->composerJsonExists()) {
-                note("Found the following required PHP libraries for " . $projectDir . ":");
-                info($phpService->getLibraries());
+                spin(
+                    message: 'Getting data from Packagist API...',
+                    callback: function () use($projectDir, $phpService) {
+                        $phpService->getLibraries($projectDir);
+                    }
+                );
+
                 note("Found the following required dev PHP libraries for " . $projectDir . ":");
                 info($phpService->getDevLibraries());
             } else {
