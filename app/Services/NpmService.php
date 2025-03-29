@@ -12,6 +12,17 @@ class NpmService
     public function __construct(protected string $path){
     }
 
+    public function getPackageJson()
+    {
+        $packageJson = null;
+        try {
+            $packageJson = json_decode(file_get_contents($this->path . '/package.json'));
+        } catch (\ErrorException) {
+            warning("No package.json found, skipping.");
+        }
+        return $packageJson;
+    }
+
     public function printLibraries() : void
     {
         $packageJson = json_decode(file_get_contents($this->path . '/package.json'));

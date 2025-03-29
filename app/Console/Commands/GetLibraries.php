@@ -10,6 +10,7 @@ use App\Services\NpmService;
 use function Laravel\Prompts\text;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\note;
+use function Laravel\Prompts\warning;
 use function Laravel\Prompts\confirm;
 
 class GetLibraries extends Command
@@ -52,8 +53,11 @@ class GetLibraries extends Command
             info($phpService->getDevLibraries());
 
             $npmService = new NpmService($projectsPath . "/" . $projectDir);
-            $npmService->printLibraries();
-            $npmService->printDevLibraries();
+            $packageJson = $npmService->getPackageJson();
+            if ($packageJson) {
+                $npmService->printLibraries();
+                $npmService->printDevLibraries();
+            }
             note("Done getting PHP and JavaScript dependencies for " . $projectDir);
         });
 
