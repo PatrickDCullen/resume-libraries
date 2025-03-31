@@ -37,12 +37,13 @@ class GetLibraries extends Command
         $projectsService->getProjectDirectories()->each(function ($projectDir) use ($projectsService) {
             // For now, don't worry about repetition - merging will come later
             note('Getting PHP and JavaScript dependencies for '.$projectDir);
+            $projectAbsolutePath = $projectsService->getProjectsPath().'/'.$projectDir;
 
-            $phpService = new PhpService($projectsService->getProjectsPath().'/'.$projectDir);
-            $phpService->outputLibraries($projectDir);
+            $phpService = new PhpService($projectAbsolutePath);
+            $phpService->outputLibraries();
 
-            $npmService = new NpmService($projectsService->getProjectsPath().'/'.$projectDir);
-            $npmService->outputLibraries($projectDir);
+            $npmService = new NpmService($projectAbsolutePath);
+            $npmService->outputLibraries();
 
             note('Done getting PHP and JavaScript dependencies for '.$projectDir);
         });

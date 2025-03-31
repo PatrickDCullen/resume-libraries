@@ -12,28 +12,22 @@ class NpmService
 {
     public function __construct(protected string $path) {}
 
-    public function getPackageJson()
-    {
-        $packageJson = null;
-        try {
-            $packageJson = json_decode(file_get_contents($this->path.'/package.json'));
-        } catch (\ErrorException) {
-            warning('No package.json found, skipping.');
-        }
-
-        return $packageJson;
-    }
-
     public function outputLibraries()
     {
-        $packageJson = $this->getPackageJson();
-        if ($packageJson) {
+        if (! $this->packageJsonExists()) {
+            warning('No package.json found, skipping.');
+        } else {
             $this->printLibraries();
             $this->printDevLibraries();
         }
     }
 
-    public function printLibraries(): void
+    private function packageJsonExists(): bool
+    {
+        return file_exists($this->path.'/package.json');
+    }
+
+    private function printLibraries(): void
     {
         $packageJson = json_decode(file_get_contents($this->path.'/package.json'));
 
@@ -48,7 +42,7 @@ class NpmService
 
     }
 
-    public function printDevLibraries(): void
+    private function printDevLibraries(): void
     {
         $packageJson = json_decode(file_get_contents($this->path.'/package.json'));
 

@@ -14,29 +14,29 @@ class PhpService
     // Takes the absolute path to a given project
     public function __construct(protected string $path) {}
 
-    public function composerJsonExists(): bool
-    {
-        return file_exists($this->path.'/composer.json');
-    }
-
-    public function outputLibraries($projectDir)
+    public function outputLibraries()
     {
         if ($this->composerJsonExists()) {
             spin(
                 message: 'Getting data from Packagist API...',
-                callback: function () use ($projectDir) {
-                    $this->getLibraries($projectDir);
+                callback: function () {
+                    $this->getLibraries();
                 }
             );
 
-            note('Found the following required dev PHP libraries for '.$projectDir.':');
+            note('Found the following required dev PHP libraries, ordered by downloads over the last month::');
             info($this->getDevLibraries());
         } else {
             warning('No composer.json found, skipping.');
         }
     }
 
-    public function getLibraries($projectDir): void
+    private function composerJsonExists(): bool
+    {
+        return file_exists($this->path.'/composer.json');
+    }
+
+    private function getLibraries(): void
     {
         $composerJson = json_decode(file_get_contents($this->path.'/composer.json'));
         $requiredPhpLibraries = collect($composerJson->require)->keys();
@@ -59,12 +59,12 @@ class PhpService
 
         $librariesByDownloads = $sortedLibraries->pluck('library');
 
-        note('Found the following required PHP libraries for '.$projectDir.':');
+        note('Found the following required PHP libraries, ordered by downloads over the last month:');
         info(implode(', ', $librariesByDownloads->toArray()));
 
     }
 
-    public function getDevLibraries(): string
+    private function getDevLibraries(): string
     {
         $composerJson = json_decode(file_get_contents($this->path.'/composer.json'));
         $requiredPhpDevLibraries = collect($composerJson->{'require-dev'})->keys();
