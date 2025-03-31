@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Http;
 
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\note;
+use function Laravel\Prompts\spin;
+use function Laravel\Prompts\warning;
 
 class PhpService
 {
@@ -15,6 +17,23 @@ class PhpService
     public function composerJsonExists(): bool
     {
         return file_exists($this->path.'/composer.json');
+    }
+
+    public function outputLibraries($projectDir)
+    {
+        if ($this->composerJsonExists()) {
+            spin(
+                message: 'Getting data from Packagist API...',
+                callback: function () use ($projectDir) {
+                    $this->getLibraries($projectDir);
+                }
+            );
+
+            note('Found the following required dev PHP libraries for '.$projectDir.':');
+            info($this->getDevLibraries());
+        } else {
+            warning('No composer.json found, skipping.');
+        }
     }
 
     public function getLibraries($projectDir): void
