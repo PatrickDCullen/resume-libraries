@@ -35,24 +35,21 @@ class GetLibraries extends Command
         $projectsService = new ProjectsService;
         $projectsService->getProjectDirectories()->each(function ($projectDir) use ($projectsService) {
             // For now, don't worry about repetition - merging will come later
-
+            note("Getting PHP and JavaScript dependencies for " . $projectDir);
             $phpService = new PhpService($projectsService->getProjectsPath() . "/" . $projectDir);
-            $phpService->outputLibraries();
+            if ($phpService->composerJsonExists()) {
+                spin(
+                    message: 'Getting data from Packagist API...',
+                    callback: function () use($projectDir, $phpService) {
+                        $phpService->getLibraries($projectDir);
+                    }
+                );
 
-            // TODO move this to phpservice outputlibraries
-            // if ($phpService->composerJsonExists()) {
-            //     spin(
-            //         message: 'Getting data from Packagist API...',
-            //         callback: function () use($projectDir, $phpService) {
-            //             $phpService->getLibraries($projectDir);
-            //         }
-            //     );
-
-            //     note("Found the following required dev PHP libraries for " . $projectDir . ":");
-            //     info($phpService->getDevLibraries());
-            // } else {
-            //     warning("No composer.json found, skipping.");
-            // }
+                note("Found the following required dev PHP libraries for " . $projectDir . ":");
+                info($phpService->getDevLibraries());
+            } else {
+                warning("No composer.json found, skipping.");
+            }
 
             $npmService = new NpmService($projectsService->getProjectsPath() . "/" . $projectDir);
             $packageJson = $npmService->getPackageJson();
