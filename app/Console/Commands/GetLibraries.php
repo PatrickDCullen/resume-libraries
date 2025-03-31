@@ -42,11 +42,8 @@ class GetLibraries extends Command
             $phpService->outputLibraries($projectDir);
 
             $npmService = new NpmService($projectsService->getProjectsPath().'/'.$projectDir);
-            $packageJson = $npmService->getPackageJson();
-            if ($packageJson) {
-                $npmService->printLibraries();
-                $npmService->printDevLibraries();
-            }
+            $npmService->outputLibraries($projectDir);
+
             note('Done getting PHP and JavaScript dependencies for '.$projectDir);
         });
 

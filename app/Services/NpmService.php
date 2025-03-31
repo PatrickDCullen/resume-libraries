@@ -24,6 +24,15 @@ class NpmService
         return $packageJson;
     }
 
+    public function outputLibraries()
+    {
+        $packageJson = $this->getPackageJson();
+        if ($packageJson) {
+            $this->printLibraries();
+            $this->printDevLibraries();
+        }
+    }
+
     public function printLibraries(): void
     {
         $packageJson = json_decode(file_get_contents($this->path.'/package.json'));
