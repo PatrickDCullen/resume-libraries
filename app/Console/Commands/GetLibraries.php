@@ -2,14 +2,15 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Services\ProjectsService;
-use App\Services\PhpService;
 use App\Services\NpmService;
+use App\Services\PhpService;
+use App\Services\ProjectsService;
+use Illuminate\Console\Command;
+
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\note;
-use function Laravel\Prompts\warning;
 use function Laravel\Prompts\spin;
+use function Laravel\Prompts\warning;
 
 class GetLibraries extends Command
 {
@@ -35,29 +36,29 @@ class GetLibraries extends Command
         $projectsService = new ProjectsService;
         $projectsService->getProjectDirectories()->each(function ($projectDir) use ($projectsService) {
             // For now, don't worry about repetition - merging will come later
-            note("Getting PHP and JavaScript dependencies for " . $projectDir);
-            $phpService = new PhpService($projectsService->getProjectsPath() . "/" . $projectDir);
+            note('Getting PHP and JavaScript dependencies for '.$projectDir);
+            $phpService = new PhpService($projectsService->getProjectsPath().'/'.$projectDir);
             if ($phpService->composerJsonExists()) {
                 spin(
                     message: 'Getting data from Packagist API...',
-                    callback: function () use($projectDir, $phpService) {
+                    callback: function () use ($projectDir, $phpService) {
                         $phpService->getLibraries($projectDir);
                     }
                 );
 
-                note("Found the following required dev PHP libraries for " . $projectDir . ":");
+                note('Found the following required dev PHP libraries for '.$projectDir.':');
                 info($phpService->getDevLibraries());
             } else {
-                warning("No composer.json found, skipping.");
+                warning('No composer.json found, skipping.');
             }
 
-            $npmService = new NpmService($projectsService->getProjectsPath() . "/" . $projectDir);
+            $npmService = new NpmService($projectsService->getProjectsPath().'/'.$projectDir);
             $packageJson = $npmService->getPackageJson();
             if ($packageJson) {
                 $npmService->printLibraries();
                 $npmService->printDevLibraries();
             }
-            note("Done getting PHP and JavaScript dependencies for " . $projectDir);
+            note('Done getting PHP and JavaScript dependencies for '.$projectDir);
         });
 
     }

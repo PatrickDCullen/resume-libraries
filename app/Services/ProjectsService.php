@@ -2,8 +2,9 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\text;
 
@@ -18,17 +19,17 @@ class ProjectsService
 
     public function getProjectDirectories()
     {
-         $projectsDirectory = Storage::build([
-             "driver" => "local",
-             "root" => $this->projectsPath
-         ]);
+        $projectsDirectory = Storage::build([
+            'driver' => 'local',
+            'root' => $this->projectsPath,
+        ]);
 
-         return collect($projectsDirectory->directories("/"))->filter(function ($project) {
-             // Remove this project from the projects array
-             return $project !== Str::of(base_path())
-                 ->remove(Str::beforeLast(base_path(), "/") . "/")
-                 ->value();
-         });
+        return collect($projectsDirectory->directories('/'))->filter(function ($project) {
+            // Remove this project from the projects array
+            return $project !== Str::of(base_path())
+                ->remove(Str::beforeLast(base_path(), '/').'/')
+                ->value();
+        });
     }
 
     public function getProjectsPath()
@@ -39,11 +40,11 @@ class ProjectsService
     private function getProjectsPathInput()
     {
         $inferredProjectsPath = Str::of(base_path())
-            ->remove("/" . Str::afterLast(base_path(), "/"))
+            ->remove('/'.Str::afterLast(base_path(), '/'))
             ->value();
 
         $confirmed = confirm(
-            label: 'Is this the folder that contains your projects? ' . $inferredProjectsPath,
+            label: 'Is this the folder that contains your projects? '.$inferredProjectsPath,
             default: true,
             yes: 'Yes',
             no: 'No, let me change it',
